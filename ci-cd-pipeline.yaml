@@ -1,0 +1,52 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main      # Jab main branch pe push ho to pipeline run hoga
+  pull_request:
+    branches:
+      - main      # Jab pull request create ho to pipeline run hoga
+
+jobs:
+  build:
+    runs-on: ubuntu-latest   # Ye job Ubuntu machine pe chalega
+    
+    steps:
+    # Checkout code from GitHub repository
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    # Node.js setup karna
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'   # Node version specify karein
+
+    # Dependencies install karna (npm install)
+    - name: Install dependencies
+      run: npm install
+
+    # Tests run karna (agar tests hain to)
+    - name: Run tests
+      run: npm test
+
+    # Docker image build aur push karna
+    - name: Build Docker image
+      run: |
+        docker build -t weather-app .
+        docker tag weather-app akash337/weather-app:latest
+        docker push akash337/weather-app:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # DockerHub se image ko pull aur deploy karna
+    - name: Pull Docker image
+      run: docker pull akash337/weather-app:latest
+    
+    # Docker container ko run karna
+    - name: Run Docker container
+      run: |
+        docker run -d -p 3000:3000 akash337/weather-app:latest
