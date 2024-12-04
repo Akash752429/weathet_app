@@ -1,0 +1,35 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Use API Key from Secret
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+        run: echo "Using API Key: $API_KEY"
+
+      - name: Start Application
+        run: |
+          npm run start &
+          sleep 5
+          curl http://localhost:3000
+
+      - name: Deploy (Optional)
+        run: echo "Deploy steps go here"
