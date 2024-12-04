@@ -9,19 +9,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: List Files for Debugging
-        run: ls -la weathet_app
-
       - name: Install Dependencies
         run: npm install --prefix weathet_app
 
-      - name: Run Application
-        env:
-          API_KEY: ${{ secrets.API_KEY }}
-        run: |
-          cd weathet_app
-          npm start
+      - name: Run Tests
+        run: npm test --prefix weathet_app
+
+      - name: Build Application
+        run: npm run build --prefix weathet_app
+
